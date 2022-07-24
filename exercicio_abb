@@ -1,0 +1,387 @@
+//PEDRO HENRIQUE BARAUNA RA:156672 NOTURNO SEG-QUA
+ 
+ 
+ 
+#include <stdio.h>
+ 
+#include <string.h>
+ 
+#include <stdlib.h>
+ 
+#include <ctype.h>
+ 
+#define PI 3.1415926536
+ 
+ 
+ 
+typedef struct arvoreBinariaBusca{
+ 
+    char figura;
+ 
+    float areaDaFigura;
+ 
+    struct arvoreBinariaBusca *esq;
+ 
+    struct arvoreBinariaBusca *dir;
+ 
+}TArv;
+ 
+ 
+ 
+typedef TArv *PArv;
+ 
+ 
+ 
+PArv buscaAreaNaArvore(PArv arvoreDeFiguras, float area){
+ 
+    if(arvoreDeFiguras==NULL) return NULL;
+ 
+    else if(area<arvoreDeFiguras->areaDaFigura) return buscaAreaNaArvore(arvoreDeFiguras->esq, area);
+ 
+    else if(area>arvoreDeFiguras->areaDaFigura) return buscaAreaNaArvore(arvoreDeFiguras->dir, area);
+ 
+    else return arvoreDeFiguras;
+ 
+}
+ 
+ 
+ 
+PArv buscaTipoNaArvore(PArv arvoreDeFiguras, char figura){
+ 
+    PArv aux=NULL;
+ 
+    if(arvoreDeFiguras==NULL) return NULL;
+ 
+    if(arvoreDeFiguras->figura==figura) return arvoreDeFiguras;
+ 
+    aux=buscaTipoNaArvore(arvoreDeFiguras->esq, figura);
+ 
+    if(aux==NULL) 
+ 
+    aux = buscaTipoNaArvore(arvoreDeFiguras->dir, figura);
+ 
+    return aux;
+ 
+}
+ 
+ 
+ 
+PArv insereNaArvore(PArv arvoreDeFiguras, float area, char figura){
+ 
+    PArv novoElemento;
+ 
+    if(arvoreDeFiguras==NULL){
+ 
+        novoElemento =(PArv)malloc(sizeof(TArv));
+ 
+        novoElemento->figura = figura;
+ 
+        novoElemento->areaDaFigura = area;
+ 
+        novoElemento->esq = NULL;
+ 
+        novoElemento->dir = NULL;
+ 
+        return novoElemento;
+ 
+    }
+ 
+    if(area<arvoreDeFiguras->areaDaFigura){
+ 
+        arvoreDeFiguras->esq = insereNaArvore(arvoreDeFiguras->esq, area, figura);
+ 
+    }
+ 
+    else if(area>arvoreDeFiguras->areaDaFigura){
+ 
+        arvoreDeFiguras->dir = insereNaArvore(arvoreDeFiguras->dir, area, figura);
+ 
+    }
+ 
+    return arvoreDeFiguras;
+ 
+}
+ 
+ 
+ 
+PArv retira(PArv arvoreDeFiguras) {
+ 
+    PArv aux1, aux2, aux3;
+ 
+    if(arvoreDeFiguras==NULL) return NULL;
+ 
+        if(arvoreDeFiguras->esq==NULL && arvoreDeFiguras->dir==NULL){
+ 
+            free(arvoreDeFiguras);
+ 
+            return NULL;
+ 
+        } else if(arvoreDeFiguras->esq==NULL){                    
+ 
+            aux1= arvoreDeFiguras;
+ 
+            arvoreDeFiguras = arvoreDeFiguras->dir;
+ 
+            free(aux1);
+ 
+        } else if(arvoreDeFiguras->dir==NULL){
+ 
+            aux1 = arvoreDeFiguras;
+ 
+            arvoreDeFiguras = arvoreDeFiguras->esq;
+ 
+            free(aux1);
+ 
+        }
+ 
+        else{
+ 
+            aux2 = arvoreDeFiguras;
+ 
+            aux3 = arvoreDeFiguras->esq;
+ 
+            while(aux3->dir!=NULL){
+ 
+                aux2 = aux3;
+ 
+                aux3 = aux3->dir;
+ 
+            }
+ 
+                
+ 
+            arvoreDeFiguras->figura = aux3->figura;
+ 
+            arvoreDeFiguras->areaDaFigura = aux3->areaDaFigura;
+ 
+                
+ 
+        if(aux2==arvoreDeFiguras){
+ 
+            aux2->esq = aux3->esq;
+ 
+        }
+ 
+        else{
+ 
+            aux2->dir = aux3->esq;
+ 
+        }
+ 
+        free(aux3);
+ 
+    }
+ 
+    return arvoreDeFiguras;
+ 
+}
+ 
+ 
+ 
+PArv removeMenor(PArv arvoreDeFiguras, float area, char figura){
+ 
+    if(arvoreDeFiguras==NULL) return NULL;
+ 
+    arvoreDeFiguras->esq = removeMenor(arvoreDeFiguras->esq, area, figura);
+ 
+    arvoreDeFiguras->dir = removeMenor(arvoreDeFiguras->dir, area, figura);
+ 
+    if(arvoreDeFiguras->figura==figura && arvoreDeFiguras->areaDaFigura<area){
+ 
+        arvoreDeFiguras = retira(arvoreDeFiguras);    
+ 
+    }
+ 
+    return arvoreDeFiguras;
+ 
+}
+ 
+ 
+ 
+void imprimeApenasCirculo(PArv arvoreDeFiguras){
+ 
+    if(arvoreDeFiguras!=NULL){
+ 
+        imprimeApenasCirculo(arvoreDeFiguras->esq);
+ 
+        if(arvoreDeFiguras->figura=='c'){
+ 
+           printf("%.1f ", arvoreDeFiguras->areaDaFigura);
+ 
+        }
+ 
+        imprimeApenasCirculo(arvoreDeFiguras->dir);
+ 
+    }
+ 
+}
+ 
+void imprimeApenasRetangulo(PArv arvoreDeFiguras){
+ 
+    if(arvoreDeFiguras!=NULL){
+ 
+        imprimeApenasRetangulo(arvoreDeFiguras->esq);
+ 
+        if(arvoreDeFiguras->figura=='r'){
+ 
+           printf("%.1f ", arvoreDeFiguras->areaDaFigura);
+ 
+        }
+ 
+        imprimeApenasRetangulo(arvoreDeFiguras->dir);
+ 
+    }
+ 
+}
+ 
+void imprimeApenasTriangulos(PArv arvoreDeFiguras){
+ 
+    if(arvoreDeFiguras!=NULL){
+ 
+        imprimeApenasTriangulos(arvoreDeFiguras->esq);
+ 
+        if(arvoreDeFiguras->figura=='t'){
+ 
+           printf("%.1f ", arvoreDeFiguras->areaDaFigura);
+ 
+        }
+ 
+        imprimeApenasTriangulos(arvoreDeFiguras->dir);
+ 
+    }
+ 
+}
+ 
+void libera(PArv arvoreDeFiguras){
+ 
+    if(arvoreDeFiguras!=NULL){
+ 
+        libera(arvoreDeFiguras->esq);
+ 
+        libera(arvoreDeFiguras->dir);
+ 
+        free(arvoreDeFiguras);
+ 
+    }
+ 
+}
+ 
+int main(){
+ 
+    char figura, figuraRemovida;
+ 
+    float base, altura, raio, area, areaDaFiguraRemovida;
+ 
+    PArv arvoreDeFiguras=NULL, aux, resultadoBusca;
+ 
+        do{
+ 
+            scanf("%c", &figura);
+ 
+            figura = tolower(figura);
+ 
+            if(figura=='r'){
+ 
+               scanf("%f", &base);
+ 
+               scanf("%f", &altura);
+ 
+               area = base*altura;
+ 
+               resultadoBusca = buscaAreaNaArvore(arvoreDeFiguras, area);
+ 
+               if(resultadoBusca==NULL){
+ 
+                    arvoreDeFiguras = insereNaArvore(arvoreDeFiguras, area, figura);
+ 
+               }
+ 
+               
+ 
+            }else if(figura=='t'){
+ 
+               scanf("%f", &base);
+ 
+               scanf("%f", &altura);
+ 
+               area = (base*altura)/2;
+ 
+               resultadoBusca = buscaAreaNaArvore(arvoreDeFiguras, area);
+ 
+               if(resultadoBusca==NULL){
+ 
+                    arvoreDeFiguras = insereNaArvore(arvoreDeFiguras, area, figura);
+ 
+               }
+ 
+            }else if(figura=='c'){
+ 
+               scanf("%f", &raio);
+ 
+               area = PI*raio*raio;
+ 
+               resultadoBusca = buscaAreaNaArvore(arvoreDeFiguras, area);
+ 
+               if(resultadoBusca==NULL){
+ 
+                    arvoreDeFiguras = insereNaArvore(arvoreDeFiguras, area, figura);
+ 
+               }
+ 
+            }else if(figura=='i'){
+ 
+                aux = buscaTipoNaArvore(arvoreDeFiguras, 'c');
+ 
+                if(aux!=NULL){
+ 
+                    printf("circulo\n");
+ 
+                    imprimeApenasCirculo(arvoreDeFiguras);
+ 
+                }
+ 
+                aux = buscaTipoNaArvore(arvoreDeFiguras, 'r');
+ 
+                if(aux!=NULL){
+ 
+                    printf("\nretangulo\n");
+ 
+                    imprimeApenasRetangulo(arvoreDeFiguras);
+ 
+                }
+ 
+                aux = buscaTipoNaArvore(arvoreDeFiguras, 't');
+ 
+                if(aux!=NULL){
+ 
+                    printf("\ntriangulo\n");
+ 
+                    imprimeApenasTriangulos(arvoreDeFiguras);
+ 
+                }               
+ 
+                printf("\n\n");
+ 
+            }else if(figura=='e'){
+ 
+                scanf(" %c", &figuraRemovida);
+ 
+                figuraRemovida = tolower(figuraRemovida);
+ 
+                scanf("%f", &areaDaFiguraRemovida);
+ 
+                arvoreDeFiguras = removeMenor(arvoreDeFiguras,areaDaFiguraRemovida, figuraRemovida);
+ 
+            }
+ 
+        }while(figura!='f');
+ 
+        if(arvoreDeFiguras!=NULL){
+ 
+            libera(arvoreDeFiguras);
+ 
+        }
+ 
+    return 0;
+ 
+}

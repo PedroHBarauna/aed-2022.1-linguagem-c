@@ -1,0 +1,396 @@
+//PEDRO HENRIQUE BARAUNA RA: 156672 TURMA SEG-QUA 21-23
+ 
+#include <stdio.h>
+ 
+#define MAX_LINHAS 100
+ 
+typedef struct no *pme;// Definição da estrutura
+ 
+ 
+ 
+struct no{
+ 
+ 
+ 
+    int col, val;
+ 
+ 
+ 
+    pme prox;
+ 
+ 
+ 
+};
+ 
+ 
+ 
+typedef pme matriz[MAX_LINHAS];
+ 
+ 
+ 
+void inicializa_me(matriz m, int l){ //inicializa a matriz
+ 
+ 
+ 
+    int i;
+ 
+ 
+ 
+    for(i=0;i<l;i++){
+ 
+ 
+ 
+        m[i]=NULL;
+ 
+ 
+ 
+    }
+ 
+ 
+ 
+}
+ 
+ 
+ 
+pme busca(matriz m, int coordl, int coordc){//busca na matriz a localização
+ 
+    pme p;
+ 
+    for(p=m[coordl]; p!=NULL; p=p->prox){
+ 
+        if(p->col == coordc)
+ 
+            return p;
+ 
+    }
+ 
+    return NULL;
+ 
+}
+ 
+ 
+ 
+void insere_me(matriz m, int i, int j, int val){//insere ordenadamente na matriz
+ 
+    pme novo, p, ant;
+ 
+    novo=(pme)malloc(sizeof(struct no));
+ 
+    novo->val=val;
+ 
+    novo->col=j;
+ 
+    
+ 
+    p = busca(m, i, j);
+ 
+    if(p == NULL || p->val != -1){
+ 
+        if(m[i] == NULL){
+ 
+            novo->prox = NULL;
+ 
+            m[i] = novo;
+ 
+        }
+ 
+        else{
+ 
+            if(m[i]->col > j){
+ 
+                novo->prox = m[i];
+ 
+                m[i] = novo;
+ 
+            }
+ 
+            else{
+ 
+                for(p = m[i]; p != NULL && p->col < j; p = p->prox)
+ 
+                    ant = p;
+ 
+                novo->prox = p;
+ 
+                ant->prox = novo;
+ 
+            }
+ 
+        }
+ 
+    }
+ 
+}
+ 
+ 
+ 
+int verificaLinhaCol(int l, int c, int tamlin, int tamcol){//verifica se a posição é válida
+ 
+ 
+ 
+    if(l>=0 && c>=0 && l<tamlin && c<tamcol)
+ 
+        return 1;
+ 
+    else
+ 
+        return 0;
+ 
+ 
+ 
+}
+ 
+ 
+ 
+void calcula_espacos(matriz m, int l,  int c){
+ 
+ 
+ 
+    int i, j, k, n;//contadores
+ 
+ 
+ 
+    pme p, q;
+ 
+ 
+ 
+    for(i=0;i<l;i++){
+ 
+        for(j=0;j<c;j++){
+ 
+            p = busca(m, i, j);
+ 
+            if(p!= NULL && p->val==-1){
+ 
+                for(k=i-1;k<=i+1;k++){
+ 
+                    for(n=j-1;n<=j+1;n++){
+ 
+                        if(verificaLinhaCol(k, n, l, c)==1){
+ 
+                            q = busca(m, k, n);
+ 
+                            if(q==NULL){
+ 
+                                insere_me(m, k, n, 1);
+ 
+                            }
+ 
+                            else if(q && q->val>0){
+ 
+                                q->val++;
+ 
+                            }
+ 
+                        }
+ 
+                    }
+ 
+                }
+ 
+            }
+ 
+        }
+ 
+    }
+ 
+}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+void imprime(matriz m, int l, int c){
+ 
+ 
+ 
+    int i, j;
+ 
+ 
+ 
+    pme p;
+ 
+ 
+ 
+    for(i=0;i<l;i++){
+ 
+ 
+ 
+        p=m[i];
+ 
+ 
+ 
+        for(j=0;j<c;j++){
+ 
+ 
+ 
+            if(p!=NULL && p->col==j){
+ 
+ 
+ 
+                if(p->val==-1){
+ 
+ 
+ 
+                    printf("X ");
+ 
+ 
+ 
+                }
+ 
+ 
+ 
+                else{
+ 
+ 
+ 
+                    printf("%d ", p->val);
+ 
+ 
+ 
+                }
+ 
+ 
+ 
+                p=p->prox;
+ 
+ 
+ 
+            }
+ 
+ 
+ 
+            else{
+ 
+ 
+ 
+                printf("0 ");
+ 
+ 
+ 
+            }
+ 
+ 
+ 
+        }
+ 
+ 
+ 
+        printf("\n");
+ 
+ 
+ 
+    }
+ 
+ 
+ 
+}
+ 
+void libera(matriz m, int l){
+    pme p, q;
+    int i;
+    for(i=0;i<l;i++){
+        p=m[i];
+        while(p!=NULL){
+            q=p;
+            p=p->prox;
+            free(q);
+        }
+    }
+}
+ 
+int main(){
+ 
+ 
+ 
+    matriz campo;
+ 
+    pme p;
+ 
+ 
+ 
+    int tamlinha, tamcol, bombas, loclinha, loccol, cont;
+ 
+ 
+ 
+    do{
+ 
+ 
+ 
+        scanf("%d", &tamlinha);
+ 
+ 
+ 
+    }while(tamlinha<0 || tamlinha>100);
+ 
+ 
+ 
+    do{
+ 
+ 
+ 
+        scanf("%d", &tamcol);
+ 
+ 
+ 
+    }while(tamcol<0 || tamcol>100);
+ 
+ 
+ 
+    inicializa_me(campo, tamlinha);
+ 
+ 
+ 
+    do{
+ 
+ 
+ 
+        scanf("%d", &bombas);
+ 
+ 
+ 
+    }while(bombas<0 || bombas>50);
+ 
+ 
+ 
+    for(cont=0;cont<bombas;cont++){
+ 
+ 
+ 
+        scanf("%d", &loclinha);
+ 
+ 
+ 
+        scanf("%d", &loccol);
+ 
+ 
+ 
+        if(loclinha<tamlinha && loccol<tamcol){
+ 
+ 
+ 
+            insere_me(campo, loclinha, loccol, -1);
+ 
+ 
+ 
+        }
+ 
+ 
+ 
+    }
+ 
+ 
+ 
+    calcula_espacos(campo, tamlinha, tamcol);
+ 
+    imprime(campo, tamlinha, tamcol);
+ 
+    libera(campo, tamlinha);
+ 
+    return 0;
+ 
+ 
+ 
+}

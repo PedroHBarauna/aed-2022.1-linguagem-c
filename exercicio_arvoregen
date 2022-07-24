@@ -1,0 +1,451 @@
+//PEDRO HENRIQUE BARAUNA 156672 NOTURNO SEG-QUA
+ 
+ 
+ 
+#include <stdio.h>
+ 
+ 
+ 
+#include <string.h>
+ 
+ 
+ 
+typedef struct arvgen{
+ 
+ 
+ 
+    char nome[50];
+ 
+ 
+ 
+    int dia, mes, ano;
+ 
+ 
+ 
+    char indicacao[50];
+ 
+ 
+ 
+    struct arvgen *prim;
+ 
+ 
+ 
+    struct arvgen *prox;
+ 
+ 
+ 
+}TArvGen;
+ 
+typedef TArvGen *PArvGen;
+ 
+PArvGen busca(char c[], PArvGen arv){
+ 
+    
+ 
+    PArvGen p;
+ 
+    
+ 
+    int verif;
+ 
+    
+ 
+    if(arv==NULL) return arv;
+ 
+    
+ 
+    verif = strcmp(arv->nome, c);
+ 
+    
+ 
+    if(verif==0) return arv;
+ 
+    
+ 
+    p= busca(c, arv->prim);
+ 
+    
+ 
+    if(p!=NULL) return p;
+ 
+    
+ 
+    p= busca(c, arv->prox);
+ 
+    
+ 
+    return p;
+ 
+ 
+ 
+}
+ 
+PArvGen cria(char c[50], int dia, int mes, int ano, char indicacao[50]){
+ 
+ 
+ 
+    PArvGen a = (PArvGen)malloc(sizeof(TArvGen));
+ 
+ 
+ 
+    strcpy(a->nome, c);
+ 
+ 
+ 
+    a->dia = dia;
+ 
+ 
+ 
+    a->mes = mes;
+ 
+ 
+ 
+    a->ano = ano;
+ 
+ 
+ 
+    strcpy(a->indicacao, indicacao);
+ 
+ 
+ 
+    a->prim = NULL;
+ 
+ 
+ 
+    a->prox = NULL;
+ 
+    
+ 
+    return a;
+ 
+ 
+ 
+}
+ 
+PArvGen insereOrdenado(PArvGen raiz, PArvGen filho){
+ 
+    PArvGen p, q;
+ 
+    if(raiz->prim==NULL){
+ 
+        raiz->prim = filho;
+ 
+    }
+ 
+    else if(strcmp(filho->indicacao, raiz->nome)==0){
+ 
+        //percorre até achar o maior ano
+ 
+        for(p=raiz->prim, q=p;p->ano<filho->ano && p->prox!=NULL; q=p, p=p->prox);
+ 
+        if(p->ano<filho->ano){//insere em primeiro
+ 
+            filho->prox=p->prox;
+ 
+            p->prox=filho;
+ 
+        }
+ 
+        else if(p->ano>filho->ano){//insere em ultimo
+ 
+            if(raiz->prim->ano==p->ano){
+ 
+                filho->prox=q;
+ 
+                raiz->prim=filho;            
+ 
+            }
+ 
+            else{
+ 
+                filho->prox = q->prox;
+ 
+                q->prox = filho;
+ 
+            }
+ 
+        }
+ 
+        else{//caso o ano seja igual, insere em primeiro ou insere em utlimo
+ 
+            //percorre ate achar o maior mes
+ 
+            for(p=raiz->prim, q=p;p->mes<filho->mes && p->prox!=NULL; q=p, p=p->prox);
+ 
+            if(p->mes<filho->mes){
+ 
+                filho->prox=p->prox;
+ 
+                p->prox=filho;
+ 
+            }
+ 
+            else if(p->mes>filho->mes){
+ 
+                if(raiz->prim->mes==p->mes){
+ 
+                    filho->prox=q;
+ 
+                    raiz->prim=filho;
+ 
+                }
+ 
+                else{
+ 
+                    filho->prox = q->prox;
+ 
+                    q->prox = filho;
+ 
+                }
+ 
+            }
+ 
+            else{//caso o mes seja igual, insere em primeiro ou insere em utlimo
+ 
+                //percorre ate achar o maior dia
+ 
+                for(p=raiz->prim, q=p;p->dia<filho->dia && p->prox!=NULL; q=p, p=p->prox);
+ 
+                if(p->dia<filho->dia){
+ 
+                    filho->prox=p->prox;
+ 
+                    p->prox=filho;
+ 
+                }
+ 
+                else if(p->dia>filho->dia){
+ 
+                    if(raiz->prim->dia==p->dia){
+ 
+                        filho->prox=q;
+ 
+                        raiz->prim=filho;
+ 
+                    }
+ 
+                    else{
+ 
+                        filho->prox = q->prox;
+ 
+                        q->prox = filho;
+ 
+                    }
+ 
+                }
+ 
+                else{
+ 
+                    filho->prox=p->prox;
+ 
+                    p->prox=filho;
+ 
+                }
+ 
+            }
+ 
+        }
+ 
+    } 
+ 
+    else{
+ 
+        
+ 
+        p = busca(filho->indicacao, raiz);
+ 
+        
+ 
+        p = insereOrdenado(p, filho);
+ 
+        
+ 
+    }
+ 
+    return raiz;
+ 
+}
+ 
+ 
+ 
+PArvGen removeArvore(char c[50], PArvGen arv){//remove
+ 
+    PArvGen p, q=arv, r, s;
+ 
+    p = busca(c, arv);
+ 
+    if(p!=NULL){//se achou algo na busca
+ 
+        if(strcmp(p->indicacao, "fundador")==0){
+ 
+            libera(arv);
+ 
+            arv=NULL;
+ 
+        }
+ 
+        else if(arv->prim!=NULL){// se existe filho a esquerda
+ 
+            q = removeArvore(c, arv->prim);// recursividade até o ultimo filho a esquerda
+ 
+            if(strcmp(q->nome, p->nome)==0){// se for filho a esquerda, arruma os ponteiros com a arvore anterior
+ 
+                arv->prim = q->prox;
+ 
+                libera(q);
+ 
+                q=NULL;
+ 
+            }
+ 
+            else{// se nao, percorre a lista até achar o elemento
+ 
+                for(r=q;strcmp(r->nome, p->nome)!=0 && r->prox!=NULL;s=r,r=r->prox);
+ 
+                if(strcmp(r->nome, p->nome)==0){
+ 
+                    s->prox=r->prox;
+ 
+                    free(r);
+ 
+                    r=NULL;
+ 
+                }
+ 
+            }
+ 
+        }
+ 
+    }
+ 
+    return arv;
+ 
+}
+ 
+ 
+void imprime (PArvGen a){//imprime
+ 
+    printf("%s\n", a->nome);
+ 
+    if(a->prim!=NULL){
+ 
+        imprime (a->prim);
+ 
+    }
+ 
+    if(a->prox!=NULL){
+ 
+        imprime(a->prox);
+ 
+    }
+ 
+}
+ 
+ 
+void libera (PArvGen a){//libera
+ 
+    if (a!=NULL){
+ 
+        libera(a->prim);
+ 
+        libera(a->prox);
+ 
+        free(a);
+ 
+    }
+ 
+}
+ 
+ 
+int main(){
+ 
+ 
+    PArvGen hierarquia, contHierarquia;
+ 
+ 
+    int opcao=0, dia, mes, ano, verifica, fundador=0;
+ 
+ 
+    char nome[50], indicacao[50];
+ 
+ 
+    do{
+ 
+ 
+        scanf("%d", &opcao);
+ 
+ 
+ 
+        if(opcao==1){//insere
+ 
+            scanf("%s", nome);
+ 
+            scanf("%d", &dia);
+ 
+            scanf("%d", &mes);
+ 
+            scanf("%d", &ano);
+ 
+            scanf("%s", indicacao);
+ 
+            verifica=strcmp(indicacao, "fundador");
+ 
+            if(verifica==0){//verifica se a primeira ocorrencia é o fundador para criar a raiz
+ 
+                if(fundador==0){
+ 
+                    hierarquia = cria(nome, dia, mes, ano, indicacao);
+ 
+                    fundador=1;
+ 
+                }
+ 
+            }
+ 
+            if(busca(indicacao, hierarquia)!=NULL && busca(nome, hierarquia)==NULL){//verifica se existe uma indicacao e verifica se já existe nome repetido
+ 
+                contHierarquia = cria(nome, dia, mes, ano, indicacao);
+ 
+        
+ 
+                hierarquia = insereOrdenado(hierarquia, contHierarquia);
+ 
+ 
+ 
+            }
+ 
+        }
+ 
+        else if(opcao==2){//remove
+ 
+            scanf("%s", nome);
+ 
+            hierarquia = removeArvore(nome, hierarquia);
+ 
+        }
+ 
+ 
+ 
+        else if(opcao==3){//imprime
+ 
+            if(hierarquia!=NULL){
+ 
+                imprime(hierarquia);
+ 
+            }
+ 
+        }
+ 
+ 
+ 
+    }while(opcao!=4);
+ 
+    if(hierarquia!=NULL){//libera
+ 
+        libera(hierarquia);
+ 
+    }
+ 
+    return 0;
+ 
+}

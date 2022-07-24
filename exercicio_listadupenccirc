@@ -1,0 +1,304 @@
+/*PEDRO HENRIQUE BARAUNA RA: 156672 TURMA 21-23 SEG E QUA*/ 
+#include <stdio.h>
+#include <stdlib.h>
+ 
+ 
+ 
+int dinheiro;
+
+typedef struct listaDupEncCirc{
+
+  int numRoleta;
+
+  int valor;
+
+  struct listaDupEncCirc* prox;
+
+  struct listaDupEncCirc* ant;
+
+}Tlista2;
+ 
+ 
+ 
+typedef Tlista2 *Plista2;
+ 
+ 
+Plista2 insere(Plista2 l, int n, int v){//insere 2 valores no começo da lista
+ 
+  Plista2 novoValor = (Plista2)malloc(sizeof(Tlista2));
+ 
+  novoValor->numRoleta = n;
+ 
+  novoValor->valor=v;
+ 
+  if(l==NULL){
+
+    novoValor->prox=novoValor;
+
+    novoValor->ant=novoValor;
+
+  }
+ 
+  else{
+
+    novoValor->ant=l;
+ 
+ 
+ 
+    novoValor->prox=l->prox;
+ 
+ 
+ 
+    l->prox->ant=novoValor;
+ 
+ 
+ 
+    l->prox=novoValor;
+
+  }
+
+  return(novoValor);
+
+}
+
+Plista2 busca_numRoleta(Plista2 l, int v){//busca o numero escolhido na lista
+
+    Plista2 p=l;
+
+    if(l!=NULL){
+
+        do{    
+
+            p=p->prox;
+ 
+            if(p->numRoleta==v){
+
+                return(p);
+
+            }
+
+        }while(p!=l);
+
+    }
+
+    return (NULL);
+
+} 
+ 
+Plista2 remove_num(Plista2 l, int numRemover){
+
+    Plista2 aux2=l;
+
+    if(l->prox == l && l->ant == l){
+
+        return NULL;
+
+    }
+
+    if(numRemover==l->numRoleta){
+
+        l=l->ant;
+
+        l->prox=aux2->prox;
+
+        aux2->prox->ant=l;
+
+        free(aux2);
+
+    }
+
+    else{
+
+        do{
+
+            aux2=aux2->prox;
+ 
+        }while(aux2!=l && aux2->numRoleta!=numRemover);
+
+        if(aux2->numRoleta==numRemover){
+
+            aux2->ant->prox=aux2->prox;
+
+            aux2->prox->ant=aux2->ant;
+
+            free(aux2);
+
+        }
+ 
+    }
+ 
+    return (l);
+    //retorno a lista
+
+}
+
+ 
+Plista2 calcula_antihorario(Plista2 l){// troca de forma antihoraria o valor da lista
+ 
+    Plista2 aux3=l;
+ 
+    int valoraux=0;
+ 
+        if(l==NULL){
+ 
+        return (l);
+ 
+    }
+ 
+    do{
+ 
+        aux3=aux3->prox;
+
+        valoraux=aux3->valor;
+
+        aux3->valor=aux3->prox->valor;
+
+        aux3->prox->valor=valoraux;
+
+    }while(aux3!=l->ant);
+
+ return(l);
+
+ 
+}
+
+ 
+Plista2 calcula_horario(Plista2 l){//troca de forma horaria o valor da lista
+
+    Plista2 aux3=l;
+ 
+    int valoraux=0;
+ 
+    if(l==NULL){
+ 
+        return (l);
+ 
+    }
+ 
+    do{
+
+        valoraux=aux3->valor;
+
+        aux3->valor=aux3->ant->valor;
+
+        aux3->ant->valor=valoraux;
+
+        aux3=aux3->ant;
+
+    }while(aux3->ant!=l);
+
+    return(l);
+ 
+}
+
+void imprime_circ(Plista2 l){
+ 
+    Plista2 p=l;
+
+    if(l!=NULL){
+
+        do{  
+ 
+            p=p->prox;
+ 
+            printf("%d %d\n", p->numRoleta, p->valor);
+ 
+        }while(p!=l);
+ 
+    }
+ 
+    else{
+        printf("Lista Vazia!");
+ 
+    }
+ 
+}
+ 
+void libera(Plista2 l){
+ 
+    Plista2 p = l->prox;
+ 
+    Plista2 q = l;
+ 
+    while(p!=l){
+ 
+        q=p;
+ 
+        p=p->prox;
+ 
+        free(q);
+ 
+    }
+ 
+    free(l);
+ 
+}
+ 
+int main() {
+ 
+  Plista2 p, roleta =NULL;
+ 
+  int qntdRoleta, i, numeroRoleta, valorRoleta, jogadas, numSort;
+ 
+  scanf("%d", &dinheiro);
+ 
+  scanf("%d", &qntdRoleta);
+ 
+  for(i=0;i<qntdRoleta;i++){
+ 
+    scanf("%d", &numeroRoleta);
+ 
+    scanf("%d", &valorRoleta);
+ 
+    roleta=insere(roleta, numeroRoleta, valorRoleta);
+ 
+  }
+ 
+  scanf("%d", &jogadas);
+ 
+  for(i=0;i<jogadas;i++){
+ 
+    scanf("%d", &numSort);
+ 
+    p = busca_numRoleta(roleta, numSort);  
+ 
+    if(p!=NULL){
+ 
+        if(numSort % 2 == 0){ 
+ 
+            dinheiro -= p->valor;   
+ 
+            roleta = remove_num(roleta, p->numRoleta);           
+ 
+            if(roleta!=NULL)
+ 
+                roleta = calcula_horario(roleta);
+ 
+        }    
+ 
+        else{
+ 
+            dinheiro += p->valor;   
+ 
+            roleta = remove_num(roleta, p->numRoleta);
+
+            if(roleta!=NULL)
+ 
+                roleta = calcula_antihorario(roleta);
+
+        }
+ 
+    }
+ 
+  }
+
+  printf("%d\n", dinheiro);
+  imprime_circ(roleta);
+
+  if(roleta!=NULL){
+    libera(roleta);
+  }
+
+ return 0;
+
+}

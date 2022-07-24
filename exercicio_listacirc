@@ -1,0 +1,237 @@
+/*PEDRO HENRIQUE BARAUNA RA:156672 AED1 Turma 21-23*/
+ 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+ 
+typedef struct lista{
+    int info;
+    struct lista* prox;
+ 
+}Tlista;
+ 
+typedef Tlista *Plista;
+ 
+Plista insere(Plista cartas, int v){
+    Plista novo = (Plista)malloc(sizeof(Tlista));
+    novo->info = v;
+    if(cartas==NULL){
+        cartas=novo;
+        cartas->prox=novo;
+    }
+    else{
+        novo->prox=cartas->prox;
+        cartas->prox = novo;
+    }
+    return (cartas);
+}
+ 
+Plista ordena(Plista l){
+    Plista index, index1 =NULL;
+    int aux, i, aux2;
+    if(l==NULL){//se a lista ta vazia 
+        return (NULL);
+    }
+    else{
+        do{
+            aux=0;
+            index=l;
+            while(index->prox!=l){
+                    if(index->info>index->prox->info){//verificar se é maior
+                        aux2=index->info; //utilizando auxiliar para substituir 
+                        index->info=index->prox->info;
+                        index->prox->info=aux2;
+                        aux=1;
+                    }
+                index=index->prox;
+            }
+        }while(aux);
+      return(index);
+    }
+}
+ 
+Plista removeDuplicado(Plista l){// criando uma nova lista sem os duplicados
+    Plista aux1 = l, aux2= l->prox, aux3=NULL;
+    do{
+        aux1=aux1->prox;
+        aux2=aux2->prox;
+        if(aux1->info==aux2->info){
+            aux1=aux1->prox;
+            aux2=aux2->prox;
+            if(aux3==NULL){
+                aux3=insere(aux3, aux1->info);
+            }
+            else if(aux1->info!=aux3->info){
+                aux3=insere(aux3, aux1->info);
+            }
+        }
+        else{
+            aux3=insere(aux3, aux1->info);
+        }
+    }while(aux1!=l);
+    return (aux3);
+}
+ 
+void calcula_trinca(Plista l){//calcula quantas trincas podem ser formadas
+    Plista p = l;
+    Plista q= l->prox;
+    Plista r = q->prox;
+    int contador = 0; 
+    int i;
+    do{
+        p=p->prox;
+        q=q->prox;
+        r=r->prox;
+        if(r->info==p->info && p->info==q->info && q!=p && r!=q && r!=p){
+            contador++;
+        }
+        
+    }while(r != l);
+    l=removeDuplicado(l);
+    l=removeDuplicado(l);
+    l=ordena(l);
+    
+    p=l;
+    q=l->prox;
+    r=l->prox->prox;
+    do{
+        p=p->prox;
+        q=q->prox;
+        r=r->prox;
+        if(p->info==q->info-1 && q->info==r->info-1 ){
+            contador++;
+        }
+        if(p->info==12 && q->info==1 && r->info==2){
+            contador++;
+        }
+        if(p->info==11 && q->info==12 && r->info == 1){
+            contador++;
+        }
+    }while(p != l);
+    printf("%d", contador);
+ 
+}
+ 
+ 
+ 
+void imprime_circ(Plista l){
+ 
+    Plista p;
+ 
+    int i=0;
+ 
+    if(l!=NULL){
+        p=l;
+        do{
+            p=p->prox;
+            switch(p->info){
+                case 1: printf("A");break;
+                case 2: printf("2");break;
+                case 3: printf("3");break;
+                case 4: printf("4");break;
+                case 5: printf("5");break;
+                case 6: printf("6");break;
+                case 7: printf("7");break;
+                case 8: printf("8");break;
+                case 9: printf("9");break;
+                case 10: printf("J");break;
+                case 11: printf("Q");break;
+                case 12: printf("K");break;
+                default:
+                    printf("\n");
+            }
+ 
+            i++;
+ 
+        }while(p!=l);
+ 
+    }
+ 
+    printf("\n");
+ 
+}
+ 
+ 
+ 
+void libera(Plista l){
+ 
+    Plista p = l->prox;
+ 
+    Plista q = l;
+ 
+    while(p!=l){
+ 
+        q=p;
+ 
+        p=p->prox;
+ 
+        free(q);
+ 
+    }
+ 
+    free(l);
+ 
+}
+ 
+ 
+ 
+int main(){
+    Plista cartas_mao;
+    cartas_mao=NULL;
+    int i;
+    char carta[9];
+    for(i=0;i<9;i++){/*Insere substituindo as strings por números para melhor ordenação*/
+        scanf("%c", &carta[i]);
+        if(carta[i]=='A'){
+            cartas_mao=insere(cartas_mao, 1);
+        }
+        if(carta[i]=='2'){
+            cartas_mao=insere(cartas_mao, 2);
+        }
+        if(carta[i]=='3'){
+            cartas_mao=insere(cartas_mao, 3);
+        }
+        if(carta[i]=='4'){
+            cartas_mao=insere(cartas_mao, 4);
+        }
+        if(carta[i]=='5'){
+            cartas_mao=insere(cartas_mao, 5);
+        }
+        if(carta[i]=='6'){
+             cartas_mao=insere(cartas_mao, 6);
+        }
+        if(carta[i]=='7'){
+             cartas_mao=insere(cartas_mao, 7);
+        }
+        if(carta[i]=='8'){
+             cartas_mao=insere(cartas_mao, 8);
+        }
+        if(carta[i]=='9'){
+             cartas_mao=insere(cartas_mao, 9);
+        }
+        if(carta[i]=='J'){
+            cartas_mao=insere(cartas_mao, 10);
+        }
+        if(carta[i]=='Q'){
+            cartas_mao=insere(cartas_mao, 11);
+        }
+        if(carta[i]=='K'){
+          cartas_mao=insere(cartas_mao, 12);
+        }
+        else{
+            
+        }
+    }
+    /*verificar pq da runtime error se a lista é vazia sendo que é pra retornar nada*/
+    if (cartas_mao==NULL){
+        printf("\n0");
+    }
+    else{
+        cartas_mao=ordena(cartas_mao);
+        imprime_circ(cartas_mao);
+        calcula_trinca(cartas_mao);
+        libera(cartas_mao);
+    }
+    return 0;
+ 
+}
